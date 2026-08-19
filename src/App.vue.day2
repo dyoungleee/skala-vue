@@ -1,0 +1,94 @@
+<script setup>
+import vIfElse from './components/practices/basic/10-v-else-if.vue'
+import vShow from './components/practices/basic/11-v-show.vue'
+import vFor from './components/practices/basic/12-v-for.vue'
+import vOn from './components/practices/basic/13-v-on.vue'
+import vOnEventHandling from './components/practices/basic/14-v-on-eventHandling.vue'
+import vOnEventModifier from './components/practices/basic/15-v-on-eventModifier.vue'
+import vOnSubmit from './components/practices/basic/16-v-on-submit.vue'
+import vModel from './components/practices/basic/17-v-model.vue'
+import vModelForm from './components/practices/basic/18-v-model-form.vue'
+import vModelModifiers from './components/practices/basic/19-v-model-modifiers.vue'
+import vStyle from './components/practices/basic/20-v-style.vue'
+import Ref from './components/practices/basic/21-Ref.vue'
+import Reactive from './components/practices/basic/22-Reactive.vue'
+import Computed from './components/practices/basic/23-Computed.vue'
+import Watch from './components/practices/basic/24-watch.vue'
+import WatchMulti from './components/practices/basic/25-watch-multi.vue'
+import WatchDeep from './components/practices/basic/26-deep.vue'
+import WatchEffect from './components/practices/basic/27-watchEffect.vue'
+</script>
+
+<template>
+  <div style="padding: 20px">
+    <vIfElse />
+    <br />
+    <hr />
+    <br />
+    <vShow />
+    <br />
+    <hr />
+    <br />
+    <vFor />
+    <br />
+    <hr />
+    <br />
+    <vOn />
+    <br />
+    <hr />
+    <br />
+    <vOnEventHandling />
+    <br />
+    <hr />
+    <br />
+    <vOnEventModifier />
+    <br />
+    <hr />
+    <br />
+    <vOnSubmit />
+    <br />
+    <hr />
+    <br />
+    <vModel />
+    <br />
+    <hr />
+    <br />
+    <vModelForm />
+    <br />
+    <hr />
+    <br />
+    <vModelModifiers />
+    <br />
+    <hr />
+    <br />
+    <vStyle />
+    <br />
+    <hr />
+    <br />
+    <Ref />
+    <br />
+    <hr />
+    <br />
+    <Reactive />
+    <br />
+    <hr />
+    <br />
+    <Computed />
+    <br />
+    <hr />
+    <br />
+    <Watch />
+    <br />
+    <hr />
+    <br />
+    <WatchMulti />
+    <br />
+    <hr />
+    <br />
+    <WatchDeep />
+    <br />
+    <hr />
+    <br />
+    <WatchEffect />
+  </div>
+</template>

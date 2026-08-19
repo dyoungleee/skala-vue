@@ -1,0 +1,49 @@
+<script setup>
+import SampleOne from './components/practices/basic/1-SampleOne.vue'
+import SampleTwo from './components/practices/basic/2-SampleTwo.vue'
+import vHtml from './components/practices/basic/3-v-html.vue'
+import vHtmlXSS from './components/practices/basic/4-v-html-XSS.vue'
+import vText from './components/practices/basic/5-v-text.vue'
+import vBind from './components/practices/basic/6-v-bind.vue'
+import vBindClass from './components/practices/basic/7-v-bind-class.vue'
+import vBindStyle from './components/practices/basic/8-v-bind-style.vue'
+import vBindShort from './components/practices/basic/9-v-bind-short.vue'
+</script>
+
+<template>
+  <div style="padding: 20px">
+    <SampleOne />
+    <br />
+    <hr />
+    <br />
+    <SampleTwo />
+    <br />
+    <hr />
+    <br />
+    <vHtml />
+    <br />
+    <hr />
+    <br />
+    <vHtmlXSS />
+    <br />
+    <hr />
+    <br />
+    <vText />
+    <br />
+    <hr />
+    <br />
+    <vBind />
+    <br />
+    <hr />
+    <br />
+    <vBindClass />
+    <br />
+    <hr />
+    <br />
+    <vBindStyle />
+    <br />
+    <hr />
+    <br />
+    <vBindShort />
+ </div>
+</template>
