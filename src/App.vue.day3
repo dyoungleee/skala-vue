@@ -1,0 +1,14 @@
+<script setup>
+import LifecycleHook from './components/practices/basic/28-component-lifecycle-hook.vue'
+
+</script>
+
+<template>
+  <div style="padding: 20px">
+    <LifecycleHook />
+    <br />
+    <hr />
+    <br />
+    
+  </div>
+</template>
