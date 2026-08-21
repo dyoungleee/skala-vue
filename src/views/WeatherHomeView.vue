@@ -121,6 +121,11 @@ const showDetail = (city) => {
     },
   })
 }
+
+// 더 검색하기를 누르면 검색 영역이 있는 페이지 최상단으로 이동함
+const scrollToSearch = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
 </script>
 
 <template>
@@ -144,7 +149,7 @@ const showDetail = (city) => {
           <div>
             <h2>지역별 날씨 현황</h2>
           </div>
-          <a class="city-count city-count-link" href="#city-search">
+          <a class="city-count city-count-link" href="#city-search" @click.prevent="scrollToSearch">
             {{ filteredWeatherList.length }}개 도시 · 더 검색하기
           </a>
         </div>
