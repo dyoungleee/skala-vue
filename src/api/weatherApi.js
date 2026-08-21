@@ -7,6 +7,12 @@ const openWeatherApi = axios.create({
   timeout: 10000,
 })
 
+// [개인 커스텀] 도시명 검색을 좌표로 바꾸기 위해 OpenWeather Geocoding API를 추가한다.
+const geocodingApi = axios.create({
+  baseURL: 'https://api.openweathermap.org/geo/1.0',
+  timeout: 10000,
+})
+
 // Open-Meteo Air Quality API에서 상세 오염물질과 자외선 지수를 추가로 조회함
 const airQualityApi = axios.create({
   baseURL: 'https://air-quality-api.open-meteo.com/v1',
@@ -67,6 +73,28 @@ const ensureApiKey = () => {
   if (!hasOpenWeatherApiKey) {
     throw new Error('OpenWeather API 키가 설정되지 않았습니다.')
   }
+}
+
+// [개인 커스텀] 등록된 Mock 목록 대신 OpenWeather가 찾은 도시 후보를 API 요청용 구조로 변환한다.
+export const searchCities = async (query) => {
+  ensureApiKey()
+
+  const response = await geocodingApi.get('/direct', {
+    params: {
+      q: query,
+      limit: 5,
+      appid: OPENWEATHER_API_KEY,
+    },
+  })
+
+  return response.data.map((city, index) => ({
+    id: `geo_${city.lat}_${city.lon}_${index}`,
+    name: city.local_names?.ko || city.name,
+    state: city.state,
+    country: city.country,
+    lat: city.lat,
+    lon: city.lon,
+  }))
 }
 
 // 현재 날씨, OpenWeather 공기질, Open-Meteo 대기 환경 데이터를 함께 요청함

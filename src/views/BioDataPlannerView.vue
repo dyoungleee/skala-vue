@@ -22,12 +22,12 @@ const {
   analysisMode,
   modeLabel,
   humidityThreshold,
-  selectedPlannerCity,
+  analyzedCity,
 } = storeToRefs(plannerStore)
 
 // Planner의 기온도 기존 온도 단위 설정에 맞춰 함께 변환함
 const plannerDisplayTemp = computed(() => {
-  const rawTemp = selectedPlannerCity.value?.temp
+  const rawTemp = analyzedCity.value?.temp
 
   if (rawTemp === null || rawTemp === undefined) return '데이터 없음'
   if (configStore.unit === 'fahrenheit') return Math.round((rawTemp * 9) / 5 + 32)
@@ -74,7 +74,7 @@ const requestResearchAnalysis = async () => {
         :analysis-mode="analysisMode"
         :mode-label="modeLabel"
         :humidity-threshold="humidityThreshold"
-        :selected-planner-city="selectedPlannerCity"
+        :selected-planner-city="analyzedCity"
         :planner-display-temp="plannerDisplayTemp"
         :unit-symbol="configStore.unitSymbol"
         @update-planner-city="updatePlannerCityQuery"

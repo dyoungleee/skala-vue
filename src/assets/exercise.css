@@ -301,6 +301,19 @@
   font-weight: 600;
 }
 
+.city-count-link {
+  color: #6e6e73;
+  text-decoration: none;
+  transition:
+    color 180ms ease,
+    background 180ms ease;
+}
+
+.city-count-link:hover {
+  color: #0071e3;
+  background: rgba(0, 113, 227, 0.1);
+}
+
 .api-status {
   display: flex;
   align-items: center;
@@ -334,6 +347,13 @@
 
 .no-result {
   padding: 48px 20px;
+  color: #86868b;
+  text-align: center;
+  font-size: 14px;
+}
+
+.weather-loading {
+  padding: 36px 20px;
   color: #86868b;
   text-align: center;
   font-size: 14px;

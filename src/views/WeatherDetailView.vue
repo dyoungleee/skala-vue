@@ -14,7 +14,21 @@ const city = ref(null)
 const isLoading = ref(false)
 
 onMounted(async () => {
-  const targetCity = weatherData.find((item) => item.id === route.params.cityId)
+  const registeredCity = weatherData.find((item) => item.id === route.params.cityId)
+  const queryLat = Number(route.query.lat)
+  const queryLon = Number(route.query.lon)
+  const targetCity =
+    registeredCity ||
+    (Number.isFinite(queryLat) && Number.isFinite(queryLon) && route.query.name
+      ? {
+          id: route.params.cityId,
+          name: route.query.name,
+          state: route.query.state,
+          country: route.query.country,
+          lat: queryLat,
+          lon: queryLon,
+        }
+      : null)
 
   if (!targetCity) return
 

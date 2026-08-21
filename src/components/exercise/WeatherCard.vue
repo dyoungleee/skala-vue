@@ -34,7 +34,7 @@ const selectCard = () => {
 }
 
 const clickDetail = () => {
-  emit('click-detail', props.weather.id)
+  emit('click-detail', props.weather)
 }
 </script>
 

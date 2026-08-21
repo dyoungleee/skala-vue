@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
-import { fetchLiveWeather } from '../api/weatherApi.js'
+import { fetchLiveWeather, searchCities } from '../api/weatherApi.js'
 import { weatherData } from '../data/weather.js'
 
 export const usePlannerStore = defineStore('planner', () => {
@@ -14,9 +14,12 @@ export const usePlannerStore = defineStore('planner', () => {
   const analysisMode = ref('normal')
 
   const plannerWeatherList = ref([])
+  // 마지막으로 실제 분석에 사용한 도시를 결과 화면에 직접 연결함
+  const analyzedCity = ref(null)
 
   const selectedPlannerCity = computed(() => {
-    return plannerWeatherList.value.find((item) => item.name === plannerCityQuery.value.trim())
+    // Geocoding API가 '부산'을 '부산광역시'처럼 바꿔도 분석에 사용한 최신 도시를 표시한다.
+    return plannerWeatherList.value[0] || null
   })
 
   const availableCityNames = computed(() => weatherData.map((item) => item.name).join(' · '))
@@ -31,6 +34,7 @@ export const usePlannerStore = defineStore('planner', () => {
     analysisMessage.value = ''
     validationMessage.value = ''
     showAnalysis.value = false
+    analyzedCity.value = null
   }
 
   // 일반 분석과 보수적 분석 모드를 전환하고 이전 결과를 초기화함
@@ -57,16 +61,18 @@ export const usePlannerStore = defineStore('planner', () => {
       return
     }
 
-    const cityConfig = weatherData.find((item) => item.name === plannerCityQuery.value.trim())
+    const cityCandidates = await searchCities(plannerCityQuery.value.trim())
+    const cityConfig = cityCandidates[0]
 
     if (!cityConfig) {
-      validationMessage.value = '등록된 도시를 찾을 수 없습니다.'
+      validationMessage.value = '검색 결과가 있는 도시를 입력해 주세요.'
       return
     }
 
     // API 실패 시 예외를 View까지 전달해 공통 API 오류 페이지로 이동하도록 함
     const city = await fetchLiveWeather(cityConfig)
     plannerWeatherList.value = [city]
+    analyzedCity.value = city
 
     // OpenWeather의 weatherMain과 한글 날씨 상태를 함께 확인해 비 여부를 판단함
     const isRainy = city.weatherMain === 'Rain' || city.status.includes('비')
@@ -123,6 +129,7 @@ export const usePlannerStore = defineStore('planner', () => {
     analysisMode,
     plannerWeatherList,
     selectedPlannerCity,
+    analyzedCity,
     availableCityNames,
     humidityThreshold,
     modeLabel,

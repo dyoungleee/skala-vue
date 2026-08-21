@@ -6,7 +6,7 @@ import { useRouter } from 'vue-router'
 import BaseDashboardCard from '../components/exercise/BaseDashboardCard.vue'
 import SearchBar from '../components/exercise/SearchBar.vue'
 import WeatherCard from '../components/exercise/WeatherCard.vue'
-import { fetchLiveWeather } from '../api/weatherApi.js'
+import { fetchLiveWeather, searchCities } from '../api/weatherApi.js'
 import { weatherData } from '../data/weather'
 
 const router = useRouter()
@@ -16,13 +16,20 @@ const weatherList = ref([])
 const searchQuery = ref('')
 const selectedCityId = ref(null)
 const selectedCityInfo = ref('카드를 클릭하거나 검색해 보세요.')
+const isLoading = ref(false)
+let searchTimer = null
+let searchRequestId = 0
 
 const loadLiveWeather = async () => {
+  isLoading.value = true
+
   try {
     weatherList.value = await axios.all(weatherData.map((city) => fetchLiveWeather(city)))
   } catch (error) {
     console.error('날씨 API 요청 실패:', error.response?.status || error.message)
     router.push('/api-error')
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -41,7 +48,8 @@ const filteredWeatherList = computed(() => {
     return weatherList.value
   }
 
-  return weatherList.value.filter((item) => item.name.includes(searchQuery.value))
+  // Geocoding API가 '전주'를 '전주시' 또는 영문명으로 반환해도 검색 결과를 그대로 표시한다.
+  return weatherList.value
 })
 
 // 선택된 도시의 최신 날씨 객체를 ID 기준으로 찾아 상태바에 연결함
@@ -56,8 +64,43 @@ const needsOutdoorCaution = computed(() => {
   return selectedCity.value.dust === '나쁨' || selectedCity.value.uv?.index >= 6
 })
 
+// [개인 커스텀] 검색어를 Geocoding API로 보내 등록 목록 밖의 도시도 실시간 목록으로 만든다.
 const updateSearchQuery = (newValue) => {
   searchQuery.value = newValue
+  selectedCityId.value = null
+  weatherList.value = []
+  searchRequestId += 1
+  clearTimeout(searchTimer)
+
+  const query = newValue.trim()
+
+  if (!query) {
+    loadLiveWeather()
+    return
+  }
+
+  if (query.length < 2) return
+
+  const currentRequestId = searchRequestId
+  searchTimer = setTimeout(async () => {
+    isLoading.value = true
+
+    try {
+      const cityConfigs = await searchCities(query)
+
+      if (currentRequestId !== searchRequestId) return
+      if (cityConfigs.length === 0) return
+
+      weatherList.value = await axios.all(cityConfigs.map((city) => fetchLiveWeather(city)))
+    } catch (error) {
+      if (currentRequestId === searchRequestId) {
+        console.error('도시 검색 API 요청 실패:', error.response?.status || error.message)
+        router.push('/api-error')
+      }
+    } finally {
+      if (currentRequestId === searchRequestId) isLoading.value = false
+    }
+  }, 500)
 }
 
 // 카드 선택 시 선택된 도시 ID와 상태바에 표시할 도시 이름을 함께 변경함
@@ -66,8 +109,17 @@ const selectCity = (item) => {
   selectedCityInfo.value = `${item.name}`
 }
 
-const showDetail = (cityId) => {
-  router.push('/weather/' + cityId)
+const showDetail = (city) => {
+  router.push({
+    path: `/weather/${city.id}`,
+    query: {
+      name: city.name,
+      state: city.state || '',
+      country: city.country || '',
+      lat: city.lat,
+      lon: city.lon,
+    },
+  })
 }
 </script>
 
@@ -83,7 +135,7 @@ const showDetail = (cityId) => {
     </section>
 
     <div class="dashboard-wrapper">
-      <BaseDashboardCard variant="search-box">
+      <BaseDashboardCard id="city-search" variant="search-box">
         <SearchBar :search-query="searchQuery" @update-search="updateSearchQuery" />
       </BaseDashboardCard>
 
@@ -92,7 +144,9 @@ const showDetail = (cityId) => {
           <div>
             <h2>지역별 날씨 현황</h2>
           </div>
-          <p class="city-count">{{ filteredWeatherList.length }}개 도시</p>
+          <a class="city-count city-count-link" href="#city-search">
+            {{ filteredWeatherList.length }}개 도시 · 더 검색하기
+          </a>
         </div>
 
         <div class="weather-grid">
@@ -106,8 +160,10 @@ const showDetail = (cityId) => {
           />
         </div>
 
+        <p v-if="isLoading" class="weather-loading">실시간 도시 정보를 불러오는 중입니다.</p>
+
         <el-empty
-          v-if="searchQuery && filteredWeatherList.length === 0"
+          v-if="!isLoading && searchQuery && filteredWeatherList.length === 0"
           class="no-result"
           description="검색 결과와 일치하는 도시가 없습니다."
           :image-size="72"
